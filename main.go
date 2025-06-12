@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"todo-api-go/controllers"
 	"todo-api-go/middlewares"
+	"todo-api-go/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,17 +18,7 @@ func main() {
 		})
 	})
 
-	router.GET("/todos", controllers.GetAllTodos)
-	router.POST("/todos", controllers.CreateTodo)
-
-	todoRoutes := router.Group("/todos").Use(middlewares.TodoMiddleware())
-	{
-		todoRoutes.POST("/", controllers.CreateTodo)
-		todoRoutes.GET("/", controllers.GetAllTodos)
-		todoRoutes.GET("/:id", controllers.GetTodo)
-		todoRoutes.PATCH("/:id", controllers.UpdateTodo)
-		todoRoutes.DELETE("/:id", controllers.DeleteTodo)
-	}
+	routes.RegisterTodoRoutes(router)
 
 	router.Run()
 }
