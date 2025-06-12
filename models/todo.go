@@ -1,7 +1,7 @@
 package models
 
 type Todo struct {
-	Id          string
-	Title       string
-	Description string
+	Id          uint   `json:"id" gorm:"primaryKey"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }

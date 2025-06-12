@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"todo-api-go/configs"
+	"todo-api-go/database"
 	"todo-api-go/middlewares"
 	"todo-api-go/routes"
 
@@ -9,6 +11,7 @@ import (
 )
 
 func main() {
+	configs.Init()
 	router := gin.Default()
 	router.Use(middlewares.Logger())
 
@@ -17,6 +20,8 @@ func main() {
 			"message": "Welcome to Todo Api",
 		})
 	})
+
+	database.Connect()
 
 	routes.RegisterTodoRoutes(router)
 

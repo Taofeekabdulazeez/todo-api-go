@@ -1,31 +1,26 @@
 ### Add a new todo
-POST http://localhost:8080/todos
+POST http://localhost:6543/todos
 Content-Type: application/json
 
 {
-  "title": "Do second Assignment",
-  "assignee": "Emmaneul Balogun",
-  "status": "completed",
-  "description": "todo blah blah blah",
-  "dueDate": "2025-03-09"
+  "title": "Read for Test",
+  "description": "todo blah blah blah"
 }
 
 ### Get all todos
-GET http://localhost:8080/todos
+GET http://localhost:6543/todos
 
 ### Get a todo
-GET http://localhost:8080/todos/2
+GET http://localhost:6543/todos/2
 
 ### Update a todo
-PATCH  http://localhost:8080/todos/3
+PATCH  http://localhost:6543/todos/2
 Content-Type: application/json
 
 {
   "title": "Do Assignment",
-  "priority": "high",
-  "assignee": "Balogun Elias",
   "description": "todo all",
 }
 
 ### Delete a todo
-DELETE http://localhost:8080/todos/2
+DELETE http://localhost:6543/todos/3
