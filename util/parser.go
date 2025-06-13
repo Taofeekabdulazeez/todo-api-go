@@ -2,10 +2,10 @@ package util
 
 import "strconv"
 
-func ParseUInt(s string) uint {
+func ParseInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		panic(err)
 	}
-	return uint(i)
+	return i
 }
