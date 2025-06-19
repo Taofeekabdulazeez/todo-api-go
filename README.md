@@ -18,8 +18,6 @@ This is a simple RESTful Todo API built with **Golang**. It provides basic CRUD 
 
 - **Go (Golang)** – Core language
 - **net/http** – HTTP server and routing
-- In-memory data storage (no external database)
-
 
 
 ---
