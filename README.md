@@ -11,7 +11,6 @@ This is a simple RESTful Todo API built with **Golang**. It provides basic CRUD 
 - Get a single todo by ID
 - Update a todo by ID
 - Delete a todo by ID
-
 ---
 
 ## 📦 Technologies Used
