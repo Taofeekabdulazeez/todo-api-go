@@ -12,18 +12,20 @@ import (
 
 func main() {
 	configs.Init()
+
 	router := gin.Default()
+
 	router.Use(middlewares.Logger())
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to Todo Api",
-		})
+	router.LoadHTMLGlob("templates/*.html")
+
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "home.html", nil)
 	})
 
-	database.Connect()
-
 	routes.RegisterTodoRoutes(router)
+
+	database.Connect()
 
 	router.Run()
 }

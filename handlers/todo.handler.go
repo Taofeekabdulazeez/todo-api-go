@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"todo-api-go/database"
 	"todo-api-go/models"
-	"todo-api-go/util"
+	"todo-api-go/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +39,7 @@ func CreateTodo(ctx *gin.Context) {
 func GetTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var todo models.Todo
-	result := database.DB.First(&todo, util.ParseInt(id))
+	result := database.DB.First(&todo, utils.ParseInt(id))
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -77,7 +77,7 @@ func UpdateTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var todo models.Todo
 
-	result := database.DB.First(&todo, util.ParseInt(id))
+	result := database.DB.First(&todo, utils.ParseInt(id))
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -115,7 +115,7 @@ func UpdateTodo(ctx *gin.Context) {
 func DeleteTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	response := database.DB.Delete(&models.Todo{}, util.ParseInt(id))
+	response := database.DB.Delete(&models.Todo{}, utils.ParseInt(id))
 
 	if response.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
