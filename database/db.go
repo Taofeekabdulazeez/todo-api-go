@@ -1,7 +1,7 @@
 package database
 
 import (
-	"os"
+	"todo-api-go/config"
 	"todo-api-go/models"
 
 	"gorm.io/driver/postgres"
@@ -10,13 +10,14 @@ import (
 
 var DB *gorm.DB
 
-func Connect() *gorm.DB {
+func Connect() {
 
-	dbname := os.Getenv("dbname")
-	host := os.Getenv("host")
-	user := os.Getenv("user")
-	password := os.Getenv("password")
-	port := os.Getenv("port")
+	c := config.Get()
+	host := c.DB_HOST
+	user := c.DB_USER
+	password := c.DB_PASSWORD
+	dbname := c.DB_NAME
+	port := c.DB_PORT
 
 	dsn := "host=" + host + " user=" + user + " password=" + password + " dbname=" + dbname + " port=" + port + " sslmode=disable TimeZone=Asia/Shanghai"
 
@@ -26,8 +27,6 @@ func Connect() *gorm.DB {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Todo{})
+	db.AutoMigrate(&models.User{}, &models.Todo{})
 	DB = db
-
-	return db
 }

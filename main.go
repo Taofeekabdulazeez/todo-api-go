@@ -1,8 +1,7 @@
 package main
 
 import (
-	"net/http"
-	"todo-api-go/configs"
+	"todo-api-go/config"
 	"todo-api-go/database"
 	"todo-api-go/middlewares"
 	"todo-api-go/routes"
@@ -11,18 +10,14 @@ import (
 )
 
 func main() {
-	configs.Init()
+	config.Init()
 
 	router := gin.Default()
 
 	router.Use(middlewares.Logger())
 
-	router.LoadHTMLGlob("templates/*.html")
-
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "home.html", nil)
-	})
-
+	routes.RegisterAppRoutes(router)
+	routes.RegisterAuthRoutes(router)
 	routes.RegisterTodoRoutes(router)
 
 	database.Connect()
