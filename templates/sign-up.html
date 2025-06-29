@@ -15,12 +15,13 @@
     >
       <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px">
         <h4 class="mb-4 text-center">Sign Up</h4>
-        <form>
+        <form action="/auth/sign-up" method="POST">
           <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
             <input
               type="email"
               class="form-control"
+              name="email"
               id="email"
               placeholder="Enter your email"
               required
@@ -29,6 +30,7 @@
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input
+              name="password"
               type="password"
               class="form-control"
               id="password"
