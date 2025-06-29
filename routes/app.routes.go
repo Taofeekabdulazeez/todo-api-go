@@ -1,20 +1,18 @@
 package routes
 
 import (
-	"net/http"
+	"todo-api-go/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterAppRoutes(router *gin.Engine) {
 
+	appHandler := handlers.NewAppHandler()
+
 	router.LoadHTMLGlob("templates/*.html")
 
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "home.html", nil)
-	})
+	router.GET("/", appHandler.HomePage)
 
-	router.GET("/sign-up", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "sign-up.html", nil)
-	})
+	router.GET("/sign-up", appHandler.SignUpPage)
 }
