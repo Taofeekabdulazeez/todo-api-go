@@ -11,7 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SignUp(ctx *gin.Context) {
+type AuthHandler struct {
+}
+
+func NewAuthHandler() *AuthHandler {
+	return &AuthHandler{}
+}
+
+func (h *AuthHandler) SignUp(ctx *gin.Context) {
 
 	var data requests.FormData
 
@@ -52,6 +59,6 @@ func SignUp(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/")
 }
 
-func SignIn(ctx *gin.Context) {
+func (h *AuthHandler) SignIn(ctx *gin.Context) {
 
 }

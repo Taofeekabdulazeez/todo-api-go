@@ -9,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateTodo(ctx *gin.Context) {
+type TodoHandler struct{}
+
+func NewTodoHandler() *TodoHandler {
+	return &TodoHandler{}
+}
+
+func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 	var todo models.Todo
 
 	err := ctx.ShouldBindJSON(&todo)
@@ -36,7 +42,7 @@ func CreateTodo(ctx *gin.Context) {
 
 }
 
-func GetTodo(ctx *gin.Context) {
+func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var todo models.Todo
 	result := database.DB.First(&todo, utils.ParseInt(id))
@@ -55,7 +61,7 @@ func GetTodo(ctx *gin.Context) {
 
 }
 
-func GetAllTodos(ctx *gin.Context) {
+func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
 	var todos []models.Todo
 
 	response := database.DB.Find(&todos)
@@ -73,7 +79,7 @@ func GetAllTodos(ctx *gin.Context) {
 	})
 }
 
-func UpdateTodo(ctx *gin.Context) {
+func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var todo models.Todo
 
@@ -112,7 +118,7 @@ func UpdateTodo(ctx *gin.Context) {
 	})
 }
 
-func DeleteTodo(ctx *gin.Context) {
+func (h *TodoHandler) DeleteTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	response := database.DB.Delete(&models.Todo{}, utils.ParseInt(id))
