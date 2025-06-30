@@ -3,7 +3,7 @@ POST http://localhost:6543/todos
 Content-Type: application/json
 
 {
-  "title": "Read for Test",
+  "title": "Read Today",
   "description": "todo blah blah blah"
 }
 
