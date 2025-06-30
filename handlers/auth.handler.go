@@ -2,25 +2,25 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
-	"todo-api-go/database"
-	"todo-api-go/models"
 	"todo-api-go/requests"
-	"todo-api-go/utils"
+	"todo-api-go/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
+	userService *services.UserService
 }
 
 func NewAuthHandler() *AuthHandler {
-	return &AuthHandler{}
+	return &AuthHandler{
+		userService: &services.UserService{},
+	}
 }
 
 func (h *AuthHandler) SignUp(ctx *gin.Context) {
 
-	var data requests.FormData
+	var data requests.CreateUserRequest
 
 	err := ctx.ShouldBind(&data)
 
@@ -32,27 +32,10 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	data.Email = strings.TrimSpace(data.Email)
-	data.Password = strings.TrimSpace(data.Password)
-
-	user := models.User{Email: data.Email, Password: data.Password}
-
-	hash, err := utils.HashPassword(user.Password)
+	user, err := h.userService.CreateUser(data)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
-			"data":  nil,
-		})
-		return
-	}
-
-	user.Password = hash
-
-	result := database.DB.Create(&user)
-
-	if result.Error != nil {
-		ctx.HTML(http.StatusBadRequest, "sign-up.html", nil)
+		ctx.HTML(http.StatusBadRequest, "sign-up.html", user)
 		return
 	}
 
