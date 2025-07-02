@@ -27,3 +27,12 @@ DELETE http://localhost:6543/todos/3
 
 ### Get a user
 GET http://localhost:6543/auth/taofeekabdulazeez2020@gmail.com
+
+### Sign In
+POST  http://localhost:6543/auth/sign-in
+Content-Type: application/json
+
+{
+  "email": "taofeekabdulazeez2020@gmail.com",
+  "password": "Taofeek@11"
+}

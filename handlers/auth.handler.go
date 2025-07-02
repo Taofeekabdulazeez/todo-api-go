@@ -63,7 +63,41 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) SignIn(ctx *gin.Context) {
+	var data requests.SignInRequest
 
+	err := ctx.ShouldBind(&data)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Request Data",
+			"data":  nil,
+		})
+		return
+	}
+
+	success, user, err := h.userService.VerifyUser(data.Email, data.Password)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+			"data":  nil,
+		})
+		return
+	}
+
+	if !success {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Sign In credentials",
+			"data":  nil,
+		})
+		return
+	}
+
+	// ctx.HTML(http.StatusOK, "home.html", user)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    user,
+	})
 }
 
 func (h *AuthHandler) GetUser(ctx *gin.Context) {

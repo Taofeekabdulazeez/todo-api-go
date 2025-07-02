@@ -7,6 +7,8 @@ import (
 	"todo-api-go/models"
 	"todo-api-go/requests"
 	"todo-api-go/utils"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct{}
@@ -41,4 +43,24 @@ func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 	result := database.DB.First(&user, "email = ?", email)
 
 	return &user, result.Error
+}
+
+func (s *UserService) VerifyUser(email string, pasword string) (bool, *models.User, error) {
+	var user models.User
+
+	result := database.DB.First(&user, "email = ?", email)
+
+	if result.Error != nil {
+		return false, nil, errors.New("error getting user")
+	}
+
+	success := s.VerifyPassword(pasword, user.Password)
+
+	return success, &user, nil
+}
+
+func (s *UserService) VerifyPassword(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
+	return err == nil
 }
