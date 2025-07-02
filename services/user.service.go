@@ -34,3 +34,11 @@ func (s *UserService) CreateUser(data requests.CreateUserRequest) (*models.User,
 
 	return &user, nil
 }
+
+func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+
+	result := database.DB.First(&user, "email = ?", email)
+
+	return &user, result.Error
+}

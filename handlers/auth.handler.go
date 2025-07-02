@@ -19,7 +19,6 @@ func NewAuthHandler() *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(ctx *gin.Context) {
-
 	var data requests.CreateUserRequest
 
 	err := ctx.ShouldBind(&data)
@@ -32,7 +31,28 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.CreateUser(data)
+	user, err := h.userService.GetUserByEmail(data.Email)
+
+	if user != nil || err != nil {
+		var error_res string
+		var status_code int
+
+		if user != nil {
+			error_res = "Account already Exist"
+			status_code = http.StatusBadRequest
+		} else {
+			error_res = "Internal Server error"
+			status_code = http.StatusInternalServerError
+		}
+
+		ctx.JSON(status_code, gin.H{
+			"error": error_res,
+			"data":  nil,
+		})
+		return
+	}
+
+	user, err = h.userService.CreateUser(data)
 
 	if err != nil {
 		ctx.HTML(http.StatusBadRequest, "sign-up.html", user)
@@ -44,4 +64,23 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 
 func (h *AuthHandler) SignIn(ctx *gin.Context) {
 
+}
+
+func (h *AuthHandler) GetUser(ctx *gin.Context) {
+	email := ctx.Param("email")
+
+	user, err := h.userService.GetUserByEmail(email)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "user not found",
+			"data":  nil,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    user,
+	})
 }

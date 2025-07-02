@@ -24,3 +24,6 @@ Content-Type: application/json
 
 ### Delete a todo
 DELETE http://localhost:6543/todos/3
+
+### Get a user
+GET http://localhost:6543/auth/taofeekabdulazeez2020@gmail.com

@@ -12,5 +12,6 @@ func RegisterAuthRoutes(router *gin.Engine) {
 	{
 		authRoutes.POST("/sign-up", authHandler.SignUp)
 		authRoutes.POST("/sign-in", authHandler.SignIn)
+		authRoutes.GET("/:email", authHandler.GetUser)
 	}
 }
