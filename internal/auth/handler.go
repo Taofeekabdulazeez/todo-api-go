@@ -1,25 +1,23 @@
-package handlers
+package auth
 
 import (
 	"net/http"
-	"todo-api-go/requests"
-	"todo-api-go/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
-	userService *services.UserService
+	userService *UserService
 }
 
 func NewAuthHandler() *AuthHandler {
 	return &AuthHandler{
-		userService: &services.UserService{},
+		userService: &UserService{},
 	}
 }
 
 func (h *AuthHandler) SignUp(ctx *gin.Context) {
-	var data requests.CreateUserRequest
+	var data CreateUserRequest
 
 	err := ctx.ShouldBind(&data)
 
@@ -69,7 +67,7 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) SignIn(ctx *gin.Context) {
-	var data requests.SignInRequest
+	var data SignInRequest
 
 	err := ctx.ShouldBind(&data)
 

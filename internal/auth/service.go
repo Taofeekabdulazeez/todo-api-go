@@ -1,24 +1,22 @@
-package services
+package auth
 
 import (
 	"errors"
 	"strings"
-	"todo-api-go/database"
-	"todo-api-go/models"
-	"todo-api-go/requests"
-	"todo-api-go/utils"
+	"todo-api-go/pkg/database"
+	"todo-api-go/pkg/utils"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct{}
 
-func (s *UserService) CreateUser(data requests.CreateUserRequest) (*models.User, error) {
+func (s *UserService) CreateUser(data CreateUserRequest) (*User, error) {
 
 	data.Email = strings.TrimSpace(data.Email)
 	data.Password = strings.TrimSpace(data.Password)
 
-	user := models.User{Email: data.Email, Password: data.Password}
+	user := User{Email: data.Email, Password: data.Password}
 
 	hash, err := utils.HashPassword(user.Password)
 
@@ -37,16 +35,16 @@ func (s *UserService) CreateUser(data requests.CreateUserRequest) (*models.User,
 	return &user, nil
 }
 
-func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
-	var user models.User
+func (s *UserService) GetUserByEmail(email string) (*User, error) {
+	var user User
 
 	result := database.DB.First(&user, "email = ?", email)
 
 	return &user, result.Error
 }
 
-func (s *UserService) VerifyUser(email string, pasword string) (bool, *models.User, error) {
-	var user models.User
+func (s *UserService) VerifyUser(email string, pasword string) (bool, *User, error) {
+	var user User
 
 	result := database.DB.First(&user, "email = ?", email)
 
