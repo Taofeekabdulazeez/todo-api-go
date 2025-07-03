@@ -55,11 +55,17 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 	user, err = h.userService.CreateUser(data)
 
 	if err != nil {
-		ctx.HTML(http.StatusBadRequest, "sign-up.html", user)
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+			"data":  nil,
+		})
 		return
 	}
 
-	ctx.Redirect(http.StatusFound, "/")
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "User successfully signed up",
+		"data":    user,
+	})
 }
 
 func (h *AuthHandler) SignIn(ctx *gin.Context) {

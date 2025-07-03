@@ -13,6 +13,4 @@ func RegisterAppRoutes(router *gin.Engine) {
 	router.LoadHTMLGlob("templates/*.html")
 
 	router.GET("/", appHandler.HomePage)
-
-	router.GET("/sign-up", appHandler.SignUpPage)
 }
