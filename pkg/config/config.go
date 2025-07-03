@@ -22,7 +22,7 @@ func Init() {
 	}
 }
 
-func Get() *Config {
+func GetAll() *Config {
 
 	return &Config{
 		DB_USER:     os.Getenv("user"),

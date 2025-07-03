@@ -1,4 +1,4 @@
-package requests
+package todo
 
 type CreateTodoRequest struct {
 	Title       string `json:"title"`
