@@ -33,6 +33,4 @@ This is a simple RESTful Todo API built with **Golang**. It provides basic CRUD 
 git clone https://github.com/Taofeekabdulazeez/todo-api-go.git
 cd todo-api-go
 go run ./cmd
-
-
 ```
