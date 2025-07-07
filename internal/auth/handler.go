@@ -32,19 +32,19 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 	user, err := h.userService.GetUserByEmail(data.Email)
 
 	if user != nil || err != nil {
-		var error_res string
-		var status_code int
+		var errorResponse string
+		var statusCode int
 
 		if user != nil {
-			error_res = "Account already Exist"
-			status_code = http.StatusBadRequest
+			errorResponse = "Account already Exist"
+			statusCode = http.StatusBadRequest
 		} else {
-			error_res = "Internal Server error"
-			status_code = http.StatusInternalServerError
+			errorResponse = "Internal Server error"
+			statusCode = http.StatusInternalServerError
 		}
 
-		ctx.JSON(status_code, gin.H{
-			"error": error_res,
+		ctx.JSON(statusCode, gin.H{
+			"error": errorResponse,
 			"data":  nil,
 		})
 		return
