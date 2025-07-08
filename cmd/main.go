@@ -11,6 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title todo-api-go
+// @version 1.0
+
 func main() {
 	config.Init()
 
@@ -18,7 +21,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	database.DB.AutoMigrate(&auth.User{}, &todo.Todo{})
 
 	router := gin.Default()
