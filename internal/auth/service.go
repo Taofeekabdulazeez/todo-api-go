@@ -21,7 +21,7 @@ func (s *UserService) CreateUser(data CreateUserRequest) (*User, error) {
 	hash, err := utils.HashPassword(user.Password)
 
 	if err != nil {
-		return nil, errors.New("error hashing password")
+		return nil, errors.New("error hashing user password")
 	}
 
 	user.Password = hash
