@@ -8,8 +8,8 @@ import (
 
 func Logger() gin.HandlerFunc {
 
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		fmt.Println("LoggerMiddleware invoked!")
-		c.Next()
+		ctx.Next()
 	}
 }

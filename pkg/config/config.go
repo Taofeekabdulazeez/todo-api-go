@@ -8,12 +8,15 @@ import (
 )
 
 type Config struct {
-	DB_USER     string
-	DB_PASSWORD string
-	DB_HOST     string
-	DB_PORT     string
-	DB_NAME     string
-	DSN         string
+	DB_USER              string
+	DB_PASSWORD          string
+	DB_HOST              string
+	DB_PORT              string
+	DB_NAME              string
+	DSN                  string
+	GOOGLE_CLIENT_ID     string
+	GOOGLE_CLIENT_SECRET string
+	GOOGLE_CALLBACK_URL  string
 }
 
 func Init() {
@@ -24,13 +27,15 @@ func Init() {
 }
 
 func GetAll() *Config {
-
 	return &Config{
-		DB_USER:     os.Getenv("user"),
-		DB_PASSWORD: os.Getenv("password"),
-		DB_HOST:     os.Getenv("host"),
-		DB_PORT:     os.Getenv("port"),
-		DB_NAME:     os.Getenv("dbname"),
-		DSN:        os.Getenv("DSN"),
+		DB_USER:              os.Getenv("user"),
+		DB_PASSWORD:          os.Getenv("password"),
+		DB_HOST:              os.Getenv("host"),
+		DB_PORT:              os.Getenv("port"),
+		DB_NAME:              os.Getenv("dbname"),
+		DSN:                  os.Getenv("DSN"),
+		GOOGLE_CLIENT_ID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		GOOGLE_CLIENT_SECRET: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		GOOGLE_CALLBACK_URL:  os.Getenv("GOOGLE_CALLBACK_URL"),
 	}
 }

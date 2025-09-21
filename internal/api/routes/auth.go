@@ -2,6 +2,7 @@ package routes
 
 import (
 	"todo-api-go/internal/api/handler"
+	"todo-api-go/internal/api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,5 +14,8 @@ func RegisterAuthRoutes(router *gin.Engine) {
 		authRoutes.POST("/sign-up", authHandler.SignUp)
 		authRoutes.POST("/sign-in", authHandler.SignIn)
 		authRoutes.GET("/:email", authHandler.GetUser)
+		authRoutes.GET("/user", middleware.AuthUser(), authHandler.GetAuthUser)
+		authRoutes.GET("/google/signup", authHandler.SignUpWithGoogle)
+		authRoutes.GET("/google/callback", authHandler.HandleGoogleCallback)
 	}
 }

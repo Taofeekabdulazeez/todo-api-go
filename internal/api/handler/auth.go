@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"todo-api-go/internal/api/request"
 	"todo-api-go/internal/core/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/markbates/goth/gothic"
 )
 
 type AuthHandler struct {
@@ -106,6 +108,20 @@ func (h *AuthHandler) SignIn(ctx *gin.Context) {
 	})
 }
 
+func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
+	user, exist := ctx.Get("user")
+	if !exist {
+		ctx.AbortWithError(http.StatusNotFound, errors.New("user not found"))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Success",
+		"data":    user,
+	})
+
+}
+
 func (h *AuthHandler) GetUser(ctx *gin.Context) {
 	email := ctx.Param("email")
 
@@ -123,4 +139,34 @@ func (h *AuthHandler) GetUser(ctx *gin.Context) {
 		"message": "success",
 		"data":    user,
 	})
+}
+
+func (h *AuthHandler) SignUpWithGoogle(ctx *gin.Context) {
+	query := ctx.Request.URL.Query()
+	query.Add("provider", "google")
+	ctx.Request.URL.RawQuery = query.Encode()
+
+	gothic.BeginAuthHandler(ctx.Writer, ctx.Request)
+}
+
+func (h *AuthHandler) HandleGoogleCallback(ctx *gin.Context) {
+	query := ctx.Request.URL.Query()
+	query.Add("provider", "google")
+	ctx.Request.URL.RawQuery = query.Encode()
+
+	user, err := gothic.CompleteUserAuth(ctx.Writer, ctx.Request)
+
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Success",
+		"data":    user,
+	})
+}
+
+func (h *AuthHandler) Logout(ctx *gin.Context) {
+	gothic.Logout(ctx.Writer, ctx.Request)
 }
