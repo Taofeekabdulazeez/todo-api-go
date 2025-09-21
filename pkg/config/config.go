@@ -13,6 +13,7 @@ type Config struct {
 	DB_HOST     string
 	DB_PORT     string
 	DB_NAME     string
+	DSN         string
 }
 
 func Init() {
@@ -30,5 +31,6 @@ func GetAll() *Config {
 		DB_HOST:     os.Getenv("host"),
 		DB_PORT:     os.Getenv("port"),
 		DB_NAME:     os.Getenv("dbname"),
+		DSN:        os.Getenv("DSN"),
 	}
 }
