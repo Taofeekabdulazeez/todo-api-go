@@ -1,4 +1,4 @@
-package auth
+package request
 
 type CreateUserRequest struct {
 	Email    string `form:"email"`

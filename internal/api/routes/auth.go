@@ -1,11 +1,13 @@
-package auth
+package routes
 
 import (
+	"todo-api-go/internal/api/handler"
+
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterAuthRoutes(router *gin.Engine) {
-	authHandler := NewAuthHandler()
+	authHandler := handler.NewAuthHandler()
 	authRoutes := router.Group("/auth")
 	{
 		authRoutes.POST("/sign-up", authHandler.SignUp)

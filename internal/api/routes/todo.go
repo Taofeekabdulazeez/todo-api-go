@@ -1,11 +1,13 @@
-package todo
+package routes
 
 import (
+	"todo-api-go/internal/api/handler"
+
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterTodoRoutes(router *gin.Engine) {
-	todoHandler := NewTodoHandler()
+	todoHandler := handler.NewTodoHandler()
 	todoRoutes := router.Group("/todos")
 	{
 		todoRoutes.POST("/", todoHandler.CreateTodo)

@@ -1,7 +1,8 @@
-package todo
+package handler
 
 import (
 	"net/http"
+	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/database"
 	"todo-api-go/pkg/utils"
 
@@ -15,7 +16,7 @@ func NewTodoHandler() *TodoHandler {
 }
 
 func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
-	var todo Todo
+	var todo model.Todo
 
 	err := ctx.ShouldBindJSON(&todo)
 	if err != nil {
@@ -43,7 +44,7 @@ func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 
 func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var todo Todo
+	var todo model.Todo
 	result := database.DB.First(&todo, utils.ParseInt(id))
 
 	if result.Error != nil {
@@ -61,7 +62,7 @@ func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 }
 
 func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
-	var todos []Todo
+	var todos []model.Todo
 
 	response := database.DB.Find(&todos)
 
@@ -80,7 +81,7 @@ func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
 
 func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var todo Todo
+	var todo model.Todo
 
 	result := database.DB.First(&todo, utils.ParseInt(id))
 
@@ -91,7 +92,7 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 		return
 	}
 
-	var updateData Todo
+	var updateData model.Todo
 
 	if err := ctx.ShouldBindJSON(&updateData); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -120,7 +121,7 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 func (h *TodoHandler) DeleteTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	response := database.DB.Delete(&Todo{}, utils.ParseInt(id))
+	response := database.DB.Delete(&model.Todo{}, utils.ParseInt(id))
 
 	if response.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{

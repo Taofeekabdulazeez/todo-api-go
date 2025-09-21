@@ -1,4 +1,4 @@
-package todo
+package model
 
 type Todo struct {
 	Id          int    `json:"id" gorm:"primaryKey"`

@@ -1,10 +1,9 @@
 package main
 
 import (
-	"todo-api-go/internal/auth"
-	"todo-api-go/internal/middleware"
-	"todo-api-go/internal/todo"
-	"todo-api-go/internal/web"
+	"todo-api-go/internal/api/middleware"
+	"todo-api-go/internal/api/routes"
+	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/config"
 	"todo-api-go/pkg/database"
 
@@ -22,15 +21,15 @@ func main() {
 		panic(err)
 	}
 
-	database.DB.AutoMigrate(&auth.User{}, &todo.Todo{})
+	database.DB.AutoMigrate(&model.User{}, &model.Todo{})
 
 	router := gin.Default()
 
 	router.Use(middleware.Logger())
 
-	web.RegisterAppRoutes(router)
-	auth.RegisterAuthRoutes(router)
-	todo.RegisterTodoRoutes(router)
+	routes.RegisterAuthRoutes(router)
+	routes.RegisterWebRoutes(router)
+	routes.RegisterTodoRoutes(router)
 
 	router.Run(":8080")
 }

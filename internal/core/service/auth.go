@@ -1,8 +1,10 @@
-package auth
+package service
 
 import (
 	"errors"
 	"strings"
+	"todo-api-go/internal/core/model"
+	"todo-api-go/internal/api/request"
 	"todo-api-go/pkg/database"
 	"todo-api-go/pkg/utils"
 
@@ -11,12 +13,12 @@ import (
 
 type UserService struct{}
 
-func (s *UserService) CreateUser(data CreateUserRequest) (*User, error) {
+func (s *UserService) CreateUser(data request.CreateUserRequest) (*model.User, error) {
 
 	data.Email = strings.TrimSpace(data.Email)
 	data.Password = strings.TrimSpace(data.Password)
 
-	user := User{Email: data.Email, Password: data.Password}
+	user := model.User{Email: data.Email, Password: data.Password}
 
 	hash, err := utils.HashPassword(user.Password)
 
@@ -35,16 +37,16 @@ func (s *UserService) CreateUser(data CreateUserRequest) (*User, error) {
 	return &user, nil
 }
 
-func (s *UserService) GetUserByEmail(email string) (*User, error) {
-	var user User
+func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
 
 	result := database.DB.First(&user, "email = ?", email)
 
 	return &user, result.Error
 }
 
-func (s *UserService) VerifyUser(email string, pasword string) (bool, *User, error) {
-	var user User
+func (s *UserService) VerifyUser(email string, pasword string) (bool, *model.User, error) {
+	var user model.User
 
 	result := database.DB.First(&user, "email = ?", email)
 
