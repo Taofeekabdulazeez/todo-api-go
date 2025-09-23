@@ -12,18 +12,13 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	c := config.GetAll()
-	DSN := c.DSN
+	var connectionErr error
 
-	DB, connectionErr := gorm.Open(postgres.Open(DSN), &gorm.Config{})
-
-	if connectionErr != nil {
+	if DB, connectionErr = gorm.Open(postgres.Open(config.DSN), &gorm.Config{}); connectionErr != nil {
 		log.Fatalln("Error connecting to database")
 	}
 
-	migrationErr := DB.AutoMigrate(&model.User{}, &model.Todo{})
-
-	if migrationErr != nil {
+	if migrationErr := DB.AutoMigrate(&model.User{}, &model.Todo{}); migrationErr != nil {
 		log.Fatalln("Error performing database migrations")
 	}
 }

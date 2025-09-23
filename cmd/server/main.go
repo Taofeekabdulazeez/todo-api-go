@@ -25,9 +25,9 @@ func main() {
 	router.Use(middleware.Logger())
 
 	googleProvider := google.New(
-		config.GetAll().GOOGLE_CLIENT_ID,
-		config.GetAll().GOOGLE_CLIENT_SECRET,
-		config.GetAll().GOOGLE_CALLBACK_URL,
+		config.GOOGLE_CLIENT_ID,
+		config.GOOGLE_CLIENT_SECRET,
+		config.GOOGLE_CALLBACK_URL,
 	)
 
 	goth.UseProviders(googleProvider)
@@ -36,5 +36,5 @@ func main() {
 	routes.RegisterWebRoutes(router)
 	routes.RegisterTodoRoutes(router)
 
-	router.Run(":8080")
+	router.Run(config.APP_PORT)
 }

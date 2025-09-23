@@ -1,6 +1,10 @@
+@baseUrl = http://localhost:8080
+@token = your_jwt_token_here
+
 ### Add a new todo
-POST http://localhost:8080/todos
+POST {{baseUrl}}/todos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "Read Today",
@@ -8,31 +12,23 @@ Content-Type: application/json
 }
 
 ### Get all todos
-GET http://localhost:8080/todos
+GET {{baseUrl}}/todos
+Authorization: Bearer {{token}}
 
-### Get a todo
-GET http://localhost:8080/todos/2
+### Get a todo by id
+GET {{baseUrl}}/todos/6
+Authorization: Bearer {{token}}
 
-### Update a todo
-PATCH  http://localhost:8080/todos/2
+### Update a todo (no trailing comma)
+PATCH {{baseUrl}}/todos/3
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "Do Assignment",
-  "description": "todo all",
+  "description": "todo all"
 }
 
 ### Delete a todo
-DELETE http://localhost:8080/todos/3
-
-### Get a user
-GET http://localhost:8080/auth/taofeekabdulazeez2020@gmail.com
-
-### Sign In
-POST  http://localhost:8080/auth/sign-in
-Content-Type: application/json
-
-{
-  "email": "taofeekabdulazeez2020@gmail.com",
-  "password": "Taofeek@11"
-}
+DELETE {{baseUrl}}/todos/6
+Authorization: Bearer {{token}}
