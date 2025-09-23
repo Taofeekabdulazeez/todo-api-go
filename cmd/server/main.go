@@ -1,14 +1,12 @@
 package main
 
 import (
-	"time"
 	"todo-api-go/internal/api/middleware"
 	"todo-api-go/internal/api/routes"
 	"todo-api-go/pkg/config"
 	"todo-api-go/pkg/database"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
@@ -28,15 +26,14 @@ func main() {
 
 	router.Use(middleware.Logger())
 
-	store := cookie.NewStore([]byte(config.SESSION_SECRET))
-	store.Options(sessions.Options{
-		Path:     "/",
-		MaxAge:   24 * int(time.Hour),
-		HttpOnly: true,
-		Secure:   false,
-	})
+	store := sessions.NewCookieStore([]byte(config.SESSION_SECRET))
+	store.MaxAge(config.SESSION_MAX_AGE)
+	store.Options.Path = "/"
+	store.Options.HttpOnly = true
+	store.Options.Secure = false
+	store.Options.SameSite = 0
+
 	gothic.Store = store
-	router.Use(sessions.Sessions(gothic.SessionName, store))
 
 	googleProvider := google.New(
 		config.GOOGLE_CLIENT_ID,
