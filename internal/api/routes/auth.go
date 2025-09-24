@@ -14,6 +14,6 @@ func RegisterAuthRoutes(router *gin.Engine) {
 		authRoutes.POST("/sign-in", authHandler.SignIn)
 		authRoutes.GET("/user", authHandler.GetAuthUser)
 		authRoutes.GET("/google/signup", authHandler.SignUpWithGoogle)
-		authRoutes.GET("/google/callback", authHandler.HandleGoogleCallback)
+		authRoutes.GET("/google/callback", authHandler.HandleGoogleAuth)
 	}
 }

@@ -139,7 +139,7 @@ func (h *AuthHandler) SignUpWithGoogle(ctx *gin.Context) {
 	gothic.BeginAuthHandler(ctx.Writer, ctx.Request)
 }
 
-func (h *AuthHandler) HandleGoogleCallback(ctx *gin.Context) {
+func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 	query := ctx.Request.URL.Query()
 	query.Add("provider", "google")
 	ctx.Request.URL.RawQuery = query.Encode()
