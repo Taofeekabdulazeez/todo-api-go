@@ -9,19 +9,20 @@ import (
 )
 
 var (
-	APP_PORT             string
-	DB_USER              string
-	DB_PASSWORD          string
-	DB_HOST              string
-	DB_PORT              string
-	DB_NAME              string
-	DSN                  string
-	GOOGLE_CLIENT_ID     string
-	GOOGLE_CLIENT_SECRET string
-	GOOGLE_CALLBACK_URL  string
-	SESSION_SECRET       string
-	SESSION_KEY          string
-	SESSION_MAX_AGE      int
+	APP_PORT               string
+	DB_USER                string
+	DB_PASSWORD            string
+	DB_HOST                string
+	DB_PORT                string
+	DB_NAME                string
+	DSN                    string
+	GOOGLE_CLIENT_ID       string
+	GOOGLE_CLIENT_SECRET   string
+	GOOGLE_CALLBACK_URL    string
+	GOOGLE_PROVIDER_SCOPES []string
+	SESSION_SECRET         string
+	SESSION_KEY            string
+	SESSION_MAX_AGE        int
 )
 
 func Init() {
@@ -42,6 +43,7 @@ func Init() {
 	SESSION_SECRET = os.Getenv("SESSION_SECRET")
 	SESSION_KEY = os.Getenv("SESSION_KEY")
 	SESSION_MAX_AGE = int(12 * time.Hour)
+	GOOGLE_PROVIDER_SCOPES = []string{}
 }
 
 // type Config struct {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"todo-api-go/internal/api/middleware"
+	"net/http"
 	"todo-api-go/internal/api/routes"
 	"todo-api-go/pkg/config"
 	"todo-api-go/pkg/database"
@@ -24,14 +24,12 @@ func main() {
 
 	router.Use(cors.Default())
 
-	router.Use(middleware.Logger())
-
 	store := sessions.NewCookieStore([]byte(config.SESSION_SECRET))
 	store.MaxAge(config.SESSION_MAX_AGE)
 	store.Options.Path = "/"
 	store.Options.HttpOnly = true
 	store.Options.Secure = false
-	store.Options.SameSite = 0
+	store.Options.SameSite = http.SameSiteDefaultMode
 
 	gothic.Store = store
 
@@ -39,6 +37,7 @@ func main() {
 		config.GOOGLE_CLIENT_ID,
 		config.GOOGLE_CLIENT_SECRET,
 		config.GOOGLE_CALLBACK_URL,
+		config.GOOGLE_PROVIDER_SCOPES...,
 	)
 
 	goth.UseProviders(googleProvider)
