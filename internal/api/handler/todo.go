@@ -42,6 +42,7 @@ func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 }
 
 func (h *TodoHandler) GetTodo(ctx *gin.Context) {
+	user, _ := ctx.Get("user")
 	id := ctx.Param("id")
 	var todo model.Todo
 
@@ -56,6 +57,8 @@ func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Success",
 		"data":    todo,
+		// for test purpose
+		"user": user,
 	})
 
 }

@@ -12,14 +12,17 @@ import (
 
 func RequireAuth(roles ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		_, err := getUserFromSession(ctx)
+		user, err := getUserFromSession(ctx)
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "Unauthorized User",
 				"error":   err.Error(),
 			})
+			return
 		}
+
+		ctx.Set("user", user)
 
 		ctx.Next()
 	}
