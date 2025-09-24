@@ -16,10 +16,10 @@ func Connect() {
 	var connectionErr error
 
 	if DB, connectionErr = gorm.Open(postgres.Open(config.DSN), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)}); connectionErr != nil {
-		log.Fatalln("Error connecting to database")
+		log.Fatalln("Error connecting to database", connectionErr)
 	}
 
 	if migrationErr := DB.AutoMigrate(&model.User{}, &model.Todo{}); migrationErr != nil {
-		log.Fatalln("Error performing database migrations")
+		log.Fatalln("Error performing database migrations", migrationErr)
 	}
 }

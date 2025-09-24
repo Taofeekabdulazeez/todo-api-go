@@ -8,6 +8,7 @@ import (
 	"todo-api-go/pkg/database"
 	"todo-api-go/pkg/utils"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +19,7 @@ func (s *UserService) CreateUser(data request.CreateUserRequest) (*model.User, e
 	data.Email = strings.TrimSpace(data.Email)
 	data.Password = strings.TrimSpace(data.Password)
 
-	user := model.User{Email: data.Email, Password: data.Password}
+	user := model.User{ID: uuid.New(), Email: data.Email, Password: data.Password}
 
 	hash, err := utils.HashPassword(user.Password)
 
@@ -38,7 +39,7 @@ func (s *UserService) CreateUser(data request.CreateUserRequest) (*model.User, e
 }
 
 func (s *UserService) CreateUserByEmail(email string) (*model.User, error) {
-	user := model.User{Email: email}
+	user := model.User{ID: uuid.New(), Email: email}
 
 	result := database.DB.Create(&user)
 	return &user, result.Error
