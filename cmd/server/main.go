@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/gob"
 	"net/http"
 	"todo-api-go/internal/api/routes"
+	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/config"
 	"todo-api-go/pkg/database"
 
@@ -41,6 +43,8 @@ func main() {
 	)
 
 	goth.UseProviders(googleProvider)
+
+	gob.Register(model.User{})
 
 	routes.RegisterAuthRoutes(router)
 	routes.RegisterWebRoutes(router)

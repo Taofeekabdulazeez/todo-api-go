@@ -4,10 +4,13 @@ import (
 	"errors"
 	"net/http"
 	"todo-api-go/internal/api/request"
+	"todo-api-go/internal/core/model"
 	"todo-api-go/internal/core/service"
 	"todo-api-go/pkg/config"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 )
 
@@ -34,13 +37,14 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.GetUserByEmail(data.Email)
+	var found bool
+	user, found := h.userService.GetUserByEmail(data.Email)
 
-	if user != nil || err != nil {
+	if user != nil || found {
 		var errorResponse string
 		var statusCode int
 
-		if user != nil {
+		if found {
 			errorResponse = "Account already Exist"
 			statusCode = http.StatusBadRequest
 		} else {
@@ -110,9 +114,13 @@ func (h *AuthHandler) SignIn(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
-	user, exist := ctx.Get("user")
-	if !exist {
-		ctx.AbortWithError(http.StatusNotFound, errors.New("user not found"))
+	user, err := getUserFromSession(ctx)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "No Authenticated User",
+			"error":   err.Error(),
+		})
 		return
 	}
 
@@ -136,22 +144,47 @@ func (h *AuthHandler) HandleGoogleCallback(ctx *gin.Context) {
 	query.Add("provider", "google")
 	ctx.Request.URL.RawQuery = query.Encode()
 
-	user, _ := gothic.CompleteUserAuth(ctx.Writer, ctx.Request)
+	var session *sessions.Session
+	var authUser goth.User
+	var user *model.User
+	var err error
 
-	session, err := gothic.Store.New(ctx.Request, config.SESSION_KEY)
-
-	session.Values["user"] = user
-
-	if saveError := session.Save(ctx.Request, ctx.Writer); saveError != nil {
+	if authUser, err = gothic.CompleteUserAuth(ctx.Writer, ctx.Request); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "failed to save cookie",
-			"error":   saveError,
+			"message": "Error authenticating user",
+			"error":   err.Error(),
 		})
 		return
 	}
 
-	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	var found bool
+	user, found = h.userService.GetUserByEmail(authUser.Email)
+
+	if !found {
+		if user, err = h.userService.CreateUserByEmail(authUser.Email); err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "Error creating user",
+				"error":   err.Error(),
+			})
+			return
+		}
+	}
+
+	if session, err = gothic.Store.New(ctx.Request, config.SESSION_KEY); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to initialize session",
+			"error":   err.Error(),
+		})
+		return
+	}
+	session.Values["user"] = user
+
+	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to save cookie",
+			"error":   err.Error(),
+			"user":    user,
+		})
 		return
 	}
 
@@ -161,19 +194,20 @@ func (h *AuthHandler) HandleGoogleCallback(ctx *gin.Context) {
 	})
 }
 
-func (h *AuthHandler) GetUserWithSession(ctx *gin.Context) {
-	session, err := gothic.Store.Get(ctx.Request, config.SESSION_KEY)
-
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"err": err.Error(),
-		})
-	}
-
-	user := session.Values["user"]
-	ctx.JSON(200, gin.H{"data": user})
-}
-
 func (h *AuthHandler) Logout(ctx *gin.Context) {
 	gothic.Logout(ctx.Writer, ctx.Request)
+}
+
+func getUserFromSession(ctx *gin.Context) (model.User, error) {
+	session, err := gothic.Store.Get(ctx.Request, config.SESSION_KEY)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user, ok := session.Values["user"].(model.User)
+	if !ok {
+		return model.User{}, errors.New("no valid user in session")
+	}
+
+	return user, nil
 }

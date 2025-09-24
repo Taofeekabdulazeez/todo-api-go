@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"strings"
-	"todo-api-go/internal/core/model"
 	"todo-api-go/internal/api/request"
+	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/database"
 	"todo-api-go/pkg/utils"
 
@@ -37,12 +37,28 @@ func (s *UserService) CreateUser(data request.CreateUserRequest) (*model.User, e
 	return &user, nil
 }
 
-func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
+func (s *UserService) CreateUserByEmail(email string) (*model.User, error) {
+	user := model.User{Email: email}
+
+	result := database.DB.Create(&user)
+	return &user, result.Error
+
+}
+
+func (s *UserService) CheckUser(email string) (bool, error) {
+	var user *model.User
+
+	result := database.DB.First(&user, "email = ?", email)
+
+	return user == nil, result.Error
+}
+
+func (s *UserService) GetUserByEmail(email string) (*model.User, bool) {
 	var user model.User
 
 	result := database.DB.First(&user, "email = ?", email)
 
-	return &user, result.Error
+	return &user, result.Error == nil
 }
 
 func (s *UserService) VerifyUser(email string, pasword string) (bool, *model.User, error) {
