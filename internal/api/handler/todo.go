@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"todo-api-go/internal/api/request"
 	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/database"
 	"todo-api-go/pkg/utils"
@@ -16,14 +17,23 @@ func NewTodoHandler() *TodoHandler {
 }
 
 func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
-	var todo model.Todo
-
-	if err := ctx.ShouldBindJSON(&todo); err != nil {
+	var body request.CreateTodoRequest
+	if validationErr := ctx.ShouldBindJSON(&body); validationErr != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid Request Data",
-			"error":   err,
+			"error":   validationErr,
 		})
 		return
+	}
+
+	user, _ := ctx.Get("user")
+	todo := model.Todo{
+		Title:       body.Title,
+		Description: body.Description,
+		Priority:    body.Priority,
+		Completed:   body.Completed,
+		DueDate:     body.DueDate,
+		UserID:      user.(model.User).ID,
 	}
 
 	if result := database.DB.Create(&todo); result.Error != nil {
@@ -42,7 +52,6 @@ func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 }
 
 func (h *TodoHandler) GetTodo(ctx *gin.Context) {
-	user, _ := ctx.Get("user")
 	id := ctx.Param("id")
 	var todo model.Todo
 
@@ -57,19 +66,18 @@ func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Success",
 		"data":    todo,
-		// for test purpose
-		"user": user,
 	})
 
 }
 
 func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
 	var todos []model.Todo
+	user, _ := ctx.Get("user")
 
-	if result := database.DB.Find(&todos); result.Error != nil {
+	if result := database.DB.Find(&todos, "user_id = ? ", user.(model.User).ID); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting all Todos",
-			"error":   result.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
@@ -92,17 +100,20 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 		return
 	}
 
-	var updateData model.Todo
+	var body request.UpdateTodoRequest
 
-	if err := ctx.ShouldBindJSON(&updateData); err != nil {
+	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Invalid request data",
 			"error":   err,
 		})
 	}
 
-	todo.Title = updateData.Title
-	todo.Description = updateData.Description
+	todo.Title = body.Title
+	todo.Description = body.Description
+	todo.Description = body.Description
+	todo.Completed = body.Completed
+	todo.DueDate = body.DueDate
 
 	if response := database.DB.Save(&todo); response.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
