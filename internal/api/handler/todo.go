@@ -20,8 +20,9 @@ func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 	var body request.CreateTodoRequest
 	if validationErr := ctx.ShouldBindJSON(&body); validationErr != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
 			"message": "Invalid Request Data",
-			"error":   validationErr,
+			"error":   validationErr.Error(),
 		})
 		return
 	}
@@ -38,13 +39,15 @@ func (h *TodoHandler) CreateTodo(ctx *gin.Context) {
 
 	if result := database.DB.Create(&todo); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Failed to create todo",
-			"error":   result.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
+		"success": true,
 		"message": "Todo created!",
 		"data":    todo,
 	})
@@ -57,14 +60,16 @@ func (h *TodoHandler) GetTodo(ctx *gin.Context) {
 
 	if result := database.DB.First(&todo, utils.ParseInt(id)); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Error getting Todo",
-			"error":   result.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Success",
+		"success": true,
+		"message": "Todo fetched!",
 		"data":    todo,
 	})
 
@@ -76,6 +81,7 @@ func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
 
 	if result := database.DB.Find(&todos, "user_id = ? ", user.(model.User).ID); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Error getting all Todos",
 			"error":   result.Error.Error(),
 		})
@@ -83,6 +89,7 @@ func (h *TodoHandler) GetAllTodos(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
 		"message": "success",
 		"data":    todos,
 	})
@@ -94,8 +101,9 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 
 	if result := database.DB.First(&todo, utils.ParseInt(id)); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Internal Server Error",
-			"error":   result.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
@@ -104,8 +112,9 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Invalid request data",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
@@ -115,16 +124,18 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 	todo.Completed = body.Completed
 	todo.DueDate = body.DueDate
 
-	if response := database.DB.Save(&todo); response.Error != nil {
+	if result := database.DB.Save(&todo); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Error updating todo data",
-			"error":   response.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "success",
+		"success": true,
+		"message": "Todo updated!",
 		"data":    todo,
 	})
 }
@@ -132,15 +143,17 @@ func (h *TodoHandler) UpdateTodo(ctx *gin.Context) {
 func (h *TodoHandler) DeleteTodo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	if response := database.DB.Delete(&model.Todo{}, utils.ParseInt(id)); response.Error != nil {
+	if result := database.DB.Delete(&model.Todo{}, utils.ParseInt(id)); result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
 			"message": "An error occured while deleting Todo: " + id,
-			"error":   response.Error,
+			"error":   result.Error.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
 		"message": "Todo with ID: " + id + " deleted!",
 		"data":    nil,
 	})

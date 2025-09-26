@@ -118,6 +118,7 @@ func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
 			"message": "No Authenticated User",
 			"error":   err.Error(),
 		})
@@ -125,7 +126,8 @@ func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Success",
+		"success": true,
+		"message": "User fetched successfully",
 		"data":    user,
 	})
 
@@ -151,6 +153,7 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 
 	if authUser, err = gothic.CompleteUserAuth(ctx.Writer, ctx.Request); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Error authenticating user",
 			"error":   err.Error(),
 		})
@@ -163,6 +166,7 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 	if !found {
 		if user, err = h.userService.CreateUserByEmail(authUser.Email); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
 				"message": "Error creating user",
 				"error":   err.Error(),
 			})
@@ -172,6 +176,7 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 
 	if session, err = gothic.Store.New(ctx.Request, config.SESSION_KEY); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Failed to initialize session",
 			"error":   err.Error(),
 		})
@@ -181,15 +186,16 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 
 	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
 			"message": "Failed to save cookie",
 			"error":   err.Error(),
-			"user":    user,
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Success",
+		"success": true,
+		"message": "User authenticated successfully",
 		"data":    user,
 	})
 }
