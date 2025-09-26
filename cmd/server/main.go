@@ -47,6 +47,13 @@ func main() {
 	gob.Register(model.User{})
 
 	api := router.Group("/api/v1")
+
+	api.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "OK",
+		})
+	})
+
 	routes.RegisterAuthRoutes(api)
 	routes.RegisterTodoRoutes(api)
 	routes.RegisterPagesRoutes(api)
