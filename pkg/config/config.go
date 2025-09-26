@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"todo-api-go/pkg/utils"
 
 	"github.com/joho/godotenv"
 )
@@ -24,6 +25,10 @@ var (
 	SESSION_KEY            string
 	SESSION_MAX_AGE        int = int(12 * time.Hour)
 	CLIENT_URL             string
+	MAIL_HOST              string
+	MAIL_PORT              int
+	MAIL_USERNAME          string
+	MAIL_PASSWORD          string
 )
 
 func Init() {
@@ -44,6 +49,10 @@ func Init() {
 	SESSION_SECRET = os.Getenv("SESSION_SECRET")
 	SESSION_KEY = os.Getenv("SESSION_KEY")
 	CLIENT_URL = os.Getenv("CLIENT_URL")
+	MAIL_HOST = os.Getenv("MAIL_HOST")
+	MAIL_PORT = utils.ParseInt(os.Getenv("MAIL_PORT"))
+	MAIL_USERNAME = os.Getenv("MAIL_USERNAME")
+	MAIL_PASSWORD = os.Getenv("MAIL_PASSWORD")
 }
 
 // type Config struct {

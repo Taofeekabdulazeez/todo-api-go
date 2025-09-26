@@ -9,7 +9,6 @@ import (
 	"todo-api-go/pkg/config"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 )
@@ -17,12 +16,14 @@ import (
 type AuthHandler struct {
 	userService         *service.UserService
 	verificationService *service.VerificationService
+	mailService         *service.MailService
 }
 
 func NewAuthHandler() *AuthHandler {
 	return &AuthHandler{
 		userService:         &service.UserService{},
 		verificationService: &service.VerificationService{},
+		mailService:         &service.MailService{},
 	}
 }
 
@@ -148,7 +149,6 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 	query.Add("provider", "google")
 	ctx.Request.URL.RawQuery = query.Encode()
 
-	var session *sessions.Session
 	var authUser goth.User
 	var user *model.User
 	var err error
@@ -176,20 +176,10 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 		}
 	}
 
-	if session, err = gothic.Store.New(ctx.Request, config.SESSION_KEY); err != nil {
+	if err := storeSession(ctx, "user", user); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": "Failed to initialize session",
-			"error":   err.Error(),
-		})
-		return
-	}
-	session.Values["user"] = user
-
-	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to save cookie",
+			"message": "Failed to store user session",
 			"error":   err.Error(),
 		})
 		return
@@ -233,13 +223,18 @@ func (h *AuthHandler) SignUpWithEmail(ctx *gin.Context) {
 		return
 	}
 
-	// send email logic here
+	if err := h.mailService.SendVerificationEmail(email, token); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Error sending verification email",
+			"error":   err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Verification email sent",
-		"data":    user,
-		"token":   token, // remove this in production
 	})
 }
 
@@ -257,10 +252,9 @@ func (h *AuthHandler) HandleEmailAuth(ctx *gin.Context) {
 	verification, err := h.verificationService.InvalidateVerificationToken(token)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"message":      "Error verifying token",
-			"verification": verification,
-			"error":        err.Error(),
+			"success": false,
+			"message": "Error verifying token",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -269,31 +263,17 @@ func (h *AuthHandler) HandleEmailAuth(ctx *gin.Context) {
 
 	if !found {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"success":      false,
-			"message":      "No user found for this token",
-			"error":        "user not found",
-			"verification": verification,
-			"user":         user,
+			"success": false,
+			"message": "No user found for this token",
+			"error":   "user not found",
 		})
 		return
 	}
 
-	session, err := gothic.Store.New(ctx.Request, config.SESSION_KEY)
-	if err != nil {
+	if err := storeSession(ctx, "user", user); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": "Failed to initialize session",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	session.Values["user"] = user
-
-	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to save cookie",
+			"message": "Failed to store user session",
 			"error":   err.Error(),
 		})
 		return
@@ -318,4 +298,20 @@ func getUserFromSession(ctx *gin.Context) (model.User, error) {
 	}
 
 	return user, nil
+}
+
+func storeSession(ctx *gin.Context, key string, value any) error {
+
+	session, err := gothic.Store.New(ctx.Request, config.SESSION_KEY)
+	if err != nil {
+		return err
+	}
+
+	session.Values[key] = value
+
+	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
+		return err
+	}
+
+	return nil
 }
