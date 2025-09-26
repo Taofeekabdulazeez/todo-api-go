@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterTodoRoutes(router *gin.Engine) {
+func RegisterTodoRoutes(router *gin.RouterGroup) {
 	todoHandler := handler.NewTodoHandler()
 	todoRoutes := router.Group("/todos", middleware.RequireAuth())
 	{

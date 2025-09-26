@@ -46,9 +46,10 @@ func main() {
 
 	gob.Register(model.User{})
 
-	routes.RegisterAuthRoutes(router)
-	routes.RegisterWebRoutes(router)
-	routes.RegisterTodoRoutes(router)
+	api := router.Group("/api/v1")
+	routes.RegisterAuthRoutes(api)
+	routes.RegisterTodoRoutes(api)
+	routes.RegisterPagesRoutes(api)
 
 	router.Run(config.APP_PORT)
 }

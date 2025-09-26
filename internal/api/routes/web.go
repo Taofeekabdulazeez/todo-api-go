@@ -6,11 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterWebRoutes(router *gin.Engine) {
+func RegisterPagesRoutes(router *gin.RouterGroup) {
 
 	webHandler := handler.NewWebHandler()
 
-	router.LoadHTMLGlob("internal/web/templates/*.html")
+	// router.LoadHTMLGlob("internal/web/templates/*.html")
 
 	router.GET("/", webHandler.HomePage)
 }
