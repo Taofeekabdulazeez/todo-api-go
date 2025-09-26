@@ -19,10 +19,11 @@ var (
 	GOOGLE_CLIENT_ID       string
 	GOOGLE_CLIENT_SECRET   string
 	GOOGLE_CALLBACK_URL    string
-	GOOGLE_PROVIDER_SCOPES []string
+	GOOGLE_PROVIDER_SCOPES []string = []string{}
 	SESSION_SECRET         string
 	SESSION_KEY            string
-	SESSION_MAX_AGE        int
+	SESSION_MAX_AGE        int = int(12 * time.Hour)
+	CLIENT_URL             string
 )
 
 func Init() {
@@ -42,8 +43,7 @@ func Init() {
 	GOOGLE_CALLBACK_URL = os.Getenv("GOOGLE_CALLBACK_URL")
 	SESSION_SECRET = os.Getenv("SESSION_SECRET")
 	SESSION_KEY = os.Getenv("SESSION_KEY")
-	SESSION_MAX_AGE = int(12 * time.Hour)
-	GOOGLE_PROVIDER_SCOPES = []string{}
+	CLIENT_URL = os.Getenv("CLIENT_URL")
 }
 
 // type Config struct {

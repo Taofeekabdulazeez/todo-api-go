@@ -19,7 +19,7 @@ func Connect() {
 		log.Fatalln("Error connecting to database", connectionErr)
 	}
 
-	if migrationErr := DB.AutoMigrate(&model.User{}, &model.Todo{}); migrationErr != nil {
+	if migrationErr := DB.AutoMigrate(&model.User{}, &model.Todo{}, &model.Verification{}); migrationErr != nil {
 		log.Fatalln("Error performing database migrations", migrationErr)
 	}
 }

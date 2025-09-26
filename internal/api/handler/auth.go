@@ -15,12 +15,14 @@ import (
 )
 
 type AuthHandler struct {
-	userService *service.UserService
+	userService         *service.UserService
+	verificationService *service.VerificationService
 }
 
 func NewAuthHandler() *AuthHandler {
 	return &AuthHandler{
-		userService: &service.UserService{},
+		userService:         &service.UserService{},
+		verificationService: &service.VerificationService{},
 	}
 }
 
@@ -198,6 +200,106 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 		"message": "User authenticated successfully",
 		"data":    user,
 	})
+}
+
+func (h *AuthHandler) SignUpWithEmail(ctx *gin.Context) {
+	var email string
+	if email = ctx.Query("email"); email == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Email is required",
+			"error":   "missing email query parameter",
+		})
+		return
+	}
+
+	user, err := h.userService.CreateUserByEmail(email)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Error creating user",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	token, err := h.verificationService.CreateVerificationToken(user.Email)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Error creating user",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// send email logic here
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Verification email sent",
+		"data":    user,
+		"token":   token, // remove this in production
+	})
+}
+
+func (h *AuthHandler) HandleEmailAuth(ctx *gin.Context) {
+	var token string
+	if token = ctx.Query("token"); token == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Token is required",
+			"error":   "missing token query parameter",
+		})
+		return
+	}
+
+	verification, err := h.verificationService.InvalidateVerificationToken(token)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"message":      "Error verifying token",
+			"verification": verification,
+			"error":        err.Error(),
+		})
+		return
+	}
+
+	user, found := h.userService.GetUserByEmail(verification.Email)
+
+	if !found {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"message":      "No user found for this token",
+			"error":        "user not found",
+			"verification": verification,
+			"user":         user,
+		})
+		return
+	}
+
+	session, err := gothic.Store.New(ctx.Request, config.SESSION_KEY)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed to initialize session",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	session.Values["user"] = user
+
+	if err = session.Save(ctx.Request, ctx.Writer); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed to save cookie",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	ctx.Redirect(http.StatusTemporaryRedirect, config.CLIENT_URL)
 }
 
 func (h *AuthHandler) Logout(ctx *gin.Context) {
