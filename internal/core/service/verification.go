@@ -1,28 +1,50 @@
 package service
 
 import (
-	"todo-api-go/internal/core/model"
-	"todo-api-go/pkg/database"
+	"time"
+	"todo-api-go/pkg/config"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
-type VerificationService struct {
-}
+type VerificationService struct{}
 
-func (s *VerificationService) InvalidateVerificationToken(token string) (model.Verification, error) {
-	var verification model.Verification
-	result := database.DB.First(&verification, "token = ? AND used = ?", token, false)
-	verification.Used = true
-	database.DB.Save(&verification)
+func (s *VerificationService) CreateToken(value any, expiresIn time.Duration) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"value": value,
+			"exp":   time.Now().Add(expiresIn).Unix(),
+		})
 
-	return verification, result.Error
-}
-
-func (s *VerificationService) CreateVerificationToken(email string) (string, error) {
-	verification := &model.Verification{
-		Token: "1234", // random string generation logic to be implemented
-		Email: email,
+	tokenString, err := token.SignedString(config.JWT_SECRET)
+	if err != nil {
+		return "", err
 	}
 
-	result := database.DB.Create(verification)
-	return verification.Token, result.Error
+	return tokenString, nil
+}
+
+func (s *VerificationService) VerifyToken(tokenString string) (any, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		return config.JWT_SECRET, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if !token.Valid {
+		return "", jwt.ErrTokenInvalidId
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", jwt.ErrTokenInvalidClaims
+	}
+
+	value, ok := claims["value"]
+	if !ok {
+		return "", jwt.ErrInvalidKey
+	}
+
+	return value, nil
 }

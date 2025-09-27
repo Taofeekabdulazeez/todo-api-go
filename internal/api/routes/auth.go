@@ -10,8 +10,6 @@ func RegisterAuthRoutes(router *gin.RouterGroup) {
 	authHandler := handler.NewAuthHandler()
 	authRoutes := router.Group("/auth")
 	{
-		authRoutes.POST("/sign-up", authHandler.SignUp)
-		authRoutes.POST("/sign-in", authHandler.SignIn)
 		authRoutes.GET("/google/signup", authHandler.SignUpWithGoogle)
 		authRoutes.GET("/google/callback", authHandler.HandleGoogleAuth)
 		authRoutes.GET("/email/signup", authHandler.SignUpWithEmail)
