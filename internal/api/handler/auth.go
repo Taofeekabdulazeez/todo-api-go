@@ -94,14 +94,20 @@ func (h *AuthHandler) SignUpWithEmail(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.CreateUserByEmail(email)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Error creating user",
-			"error":   err.Error(),
-		})
-		return
+	var found bool
+	var user *model.User
+	var err error
+
+	user, found = h.userService.GetUserByEmail(email)
+	if !found {
+		if user, err = h.userService.CreateUserByEmail(email); err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "Error creating user",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
 	token, err := h.verificationService.CreateToken(user.Email, time.Hour)
