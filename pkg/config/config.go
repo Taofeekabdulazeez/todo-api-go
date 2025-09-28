@@ -56,3 +56,12 @@ func Init() {
 	MAIL_PASSWORD = os.Getenv("MAIL_PASSWORD")
 	JWT_SECRET = []byte(os.Getenv("JWT_SECRET"))
 }
+
+func IsProd() bool {
+	if os.Getenv("ENV") == "production" {
+		return true
+	} else {
+		return false
+	}
+
+}

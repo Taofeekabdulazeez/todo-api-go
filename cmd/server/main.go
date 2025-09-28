@@ -30,7 +30,7 @@ func main() {
 	store.MaxAge(config.SESSION_MAX_AGE)
 	store.Options.Path = "/"
 	store.Options.HttpOnly = true
-	store.Options.Secure = false
+	store.Options.Secure = config.IsProd()
 	store.Options.SameSite = http.SameSiteDefaultMode
 
 	gothic.Store = store
