@@ -15,7 +15,7 @@ func (s *MailService) SendVerificationEmail(email string, token string) error {
 	msg.SetHeader("Subject", "Verify your Signup")
 	msg.SetBody("text/html", `
             <p style="text-align: center;">
-             <a href="https://localhost:8080/auth/email/signup/callback?token=`+token+`"
+             <a href="`+config.GOOGLE_CALLBACK_URL+`?token=`+token+`"
               style="background-color: #4CAF50; color: white; padding: 12px 20px; 
               text-decoration: none; font-size: 16px; border-radius: 5px;">
               Complete Signup
