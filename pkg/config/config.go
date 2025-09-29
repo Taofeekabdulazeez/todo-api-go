@@ -34,7 +34,7 @@ var (
 
 func Init() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("An error loading .env file")
+		log.Println("An error loading .env file")
 	}
 
 	APP_PORT = ":" + os.Getenv("APP_PORT")
