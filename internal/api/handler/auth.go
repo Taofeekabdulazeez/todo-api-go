@@ -76,11 +76,8 @@ func (h *AuthHandler) HandleGoogleAuth(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "User authenticated successfully",
-		"data":    user,
-	})
+	ctx.Redirect(http.StatusTemporaryRedirect, config.CLIENT_URL)
+
 }
 
 func (h *AuthHandler) SignUpWithEmail(ctx *gin.Context) {
