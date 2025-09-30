@@ -43,7 +43,7 @@ func main() {
 	store.Options.Path = "/"
 	store.Options.HttpOnly = true
 	store.Options.Secure = config.IsProd()
-	store.Options.SameSite = http.SameSiteDefaultMode
+	store.Options.SameSite = http.SameSiteNoneMode
 
 	gothic.Store = store
 
