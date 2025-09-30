@@ -24,7 +24,19 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:9000",
+			"http://localhost:9000",
+			"https://mytodoit.vercel.app",
+			"https://mytodoit.lovable.app",
+		},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           cors.DefaultConfig().MaxAge,
+	}))
 
 	store := sessions.NewCookieStore([]byte(config.SESSION_SECRET))
 	store.MaxAge(config.SESSION_MAX_AGE)
