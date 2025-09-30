@@ -16,6 +16,7 @@ func RequireAuth(roles ...string) gin.HandlerFunc {
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"success": false,
 				"message": "Unauthorized User",
 				"error":   err.Error(),
 			})

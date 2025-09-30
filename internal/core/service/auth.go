@@ -38,6 +38,20 @@ func (s *UserService) CreateUser(data request.CreateUserRequest) (*model.User, e
 	return &user, nil
 }
 
+func (s *UserService) UpdateUser(user model.User, data request.UpdateUserRequest) (*model.User, error) {
+	var updatedUser model.User
+	if result := database.DB.First(&updatedUser, user.ID); result.Error != nil {
+		return nil, result.Error
+	}
+
+	updatedUser.FirstName = data.FirstName
+	updatedUser.LastName = data.LastName
+
+	result := database.DB.Save(&updatedUser)
+
+	return &updatedUser, result.Error
+}
+
 func (s *UserService) CreateUserByEmail(email string) (*model.User, error) {
 	user := model.User{ID: uuid.New(), Email: email}
 

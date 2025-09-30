@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"time"
+	"todo-api-go/internal/api/request"
 	"todo-api-go/internal/core/model"
 	"todo-api-go/internal/core/service"
 	"todo-api-go/pkg/config"
@@ -177,7 +178,7 @@ func (h *AuthHandler) HandleEmailAuth(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
-	user, err := getUserFromSession(ctx)
+	sessionUser, err := getUserFromSession(ctx)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -188,12 +189,52 @@ func (h *AuthHandler) GetAuthUser(ctx *gin.Context) {
 		return
 	}
 
+	user, found := h.userService.GetUserByEmail(sessionUser.Email)
+	if !found {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "No Authenticated User",
+			"error":   "User retrieving user",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "User fetched successfully",
 		"data":    user,
 	})
 
+}
+
+func (h *AuthHandler) UpdateUser(ctx *gin.Context) {
+	var body request.UpdateUserRequest
+	user, _ := ctx.Get("user")
+
+	if validationErr := ctx.ShouldBindBodyWithJSON(&body); validationErr != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid Request Data",
+			"error":   validationErr.Error(),
+		})
+		return
+	}
+
+	updatedUser, err := h.userService.UpdateUser(user.(model.User), body)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Error updating user data",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "User data updated successfully",
+		"data":    updatedUser,
+	})
 }
 
 func (h *AuthHandler) Logout(ctx *gin.Context) {

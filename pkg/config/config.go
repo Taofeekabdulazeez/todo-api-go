@@ -21,6 +21,7 @@ var (
 	GOOGLE_CLIENT_SECRET   string
 	GOOGLE_CALLBACK_URL    string
 	GOOGLE_PROVIDER_SCOPES []string = []string{}
+	EMAIL_CALLBACK_URL     string
 	SESSION_SECRET         string
 	SESSION_KEY            string
 	SESSION_MAX_AGE        int = int(12 * time.Hour)
@@ -47,6 +48,7 @@ func Init() {
 	GOOGLE_CLIENT_ID = os.Getenv("GOOGLE_CLIENT_ID")
 	GOOGLE_CLIENT_SECRET = os.Getenv("GOOGLE_CLIENT_SECRET")
 	GOOGLE_CALLBACK_URL = os.Getenv("GOOGLE_CALLBACK_URL")
+	EMAIL_CALLBACK_URL = os.Getenv("EMAIL_CALLBACK_URL")
 	SESSION_SECRET = os.Getenv("SESSION_SECRET")
 	SESSION_KEY = os.Getenv("SESSION_KEY")
 	CLIENT_URL = os.Getenv("CLIENT_URL")

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/gob"
 	"net/http"
+	"time"
 	"todo-api-go/internal/api/routes"
 	"todo-api-go/internal/core/model"
 	"todo-api-go/pkg/config"
@@ -27,7 +28,6 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:9000",
-			"http://localhost:9000",
 			"https://mytodoit.vercel.app",
 			"https://mytodoit.lovable.app",
 		},
@@ -35,7 +35,7 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           cors.DefaultConfig().MaxAge,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	store := sessions.NewCookieStore([]byte(config.SESSION_SECRET))
