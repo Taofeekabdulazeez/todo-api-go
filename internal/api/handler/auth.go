@@ -238,7 +238,20 @@ func (h *AuthHandler) UpdateUser(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(ctx *gin.Context) {
-	gothic.Logout(ctx.Writer, ctx.Request)
+	if err := gothic.Logout(ctx.Writer, ctx.Request); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Couldn't log out user",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "User successfully logged out",
+		"data":    nil,
+	})
 }
 
 func getUserFromSession(ctx *gin.Context) (model.User, error) {

@@ -10,7 +10,7 @@ type MailService struct{}
 
 func (s *MailService) SendVerificationEmail(email string, token string) error {
 	msg := gomail.NewMessage()
-	msg.SetHeader("From", "taofeekabdulazeez2020@gmail.com")
+	msg.SetHeader("From", "MyTodoIt <taofeekabdulazeez2020@gmail.com>")
 	msg.SetHeader("To", email)
 	msg.SetHeader("Subject", "Verify your Signup")
 	msg.SetBody("text/html", `
@@ -24,6 +24,7 @@ func (s *MailService) SendVerificationEmail(email string, token string) error {
         `)
 
 	d := gomail.NewDialer(config.MAIL_HOST, config.MAIL_PORT, config.MAIL_USERNAME, config.MAIL_PASSWORD)
+	d.SSL = false
 
 	return d.DialAndSend(msg)
 }
