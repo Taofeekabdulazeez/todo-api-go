@@ -17,6 +17,7 @@ func RegisterAuthRoutes(router *gin.RouterGroup) {
 		authRoutes.GET("/email/callback", authHandler.HandleEmailAuth)
 		authRoutes.GET("/user", authHandler.GetAuthUser)
 		authRoutes.PATCH("/user", middleware.RequireAuth(), authHandler.UpdateUser)
+		authRoutes.PATCH("/user/photo", middleware.RequireAuth(), authHandler.UpdateUserPhoto)
 		authRoutes.POST("/logout", authHandler.Logout)
 	}
 }

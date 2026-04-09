@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"path/filepath"
 	"time"
 	"todo-api-go/internal/api/request"
 	"todo-api-go/internal/core/model"
@@ -234,6 +235,39 @@ func (h *AuthHandler) UpdateUser(ctx *gin.Context) {
 		"success": true,
 		"message": "User data updated successfully",
 		"data":    updatedUser,
+	})
+}
+
+func (h *AuthHandler) UpdateUserPhoto(ctx *gin.Context) {
+	file, err := ctx.FormFile("photo")
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "No photo provided",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Save file to uploads folder
+	filename := filepath.Base(file.Filename)
+	dst := filepath.Join("uploads", filename)
+
+	if err := ctx.SaveUploadedFile(file, dst); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Unable to save the file",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Photo uploaded successfully",
+		"data": gin.H{
+			"filepath": dst,
+		},
 	})
 }
 
