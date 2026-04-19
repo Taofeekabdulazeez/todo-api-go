@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +9,7 @@ import (
 func Logger() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
-		fmt.Println("LoggerMiddleware invoked!")
+		log.Printf("Request: %s %s\n", ctx.Request.Method, ctx.Request.URL.Path)
 		ctx.Next()
 	}
 }

@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 func TodoMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println(c.Request.URL.Path + "endpoint invoked!")
+		log.Printf("Request: %s %s\n", c.Request.Method, c.Request.URL.Path)
 		c.Next()
 	}
 }
